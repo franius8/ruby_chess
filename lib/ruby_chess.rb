@@ -59,39 +59,41 @@ class Board
     end
 
     def add_white_pieces
-        @board[0][0] = Piece.new('rook', 'black', [0, 0])
-        @board[0][7] = Piece.new('rook', 'black', [0, 7])
-        @board[0][1] = Piece.new('knight', 'black', [0, 1])
-        @board[0][6] = Piece.new('knight', 'black', [0, 6])
-        @board[0][2] = Piece.new('bishop', 'black', [0, 2])
-        @board[0][5] = Piece.new('bishop', 'black', [0, 5])
-        @board[0][3] = Piece.new('queen', 'black', [0, 3])
-        @board[0][4] = Piece.new('king', 'black', [0, 4])
+        @board[0][0] = Piece.new('rook', 'black', [0, 0], self)
+        @board[0][7] = Piece.new('rook', 'black', [0, 7], self)
+        @board[0][1] = Piece.new('knight', 'black', [0, 1], self)
+        @board[0][6] = Piece.new('knight', 'black', [0, 6], self)
+        @board[0][2] = Piece.new('bishop', 'black', [0, 2], self)
+        @board[0][5] = Piece.new('bishop', 'black', [0, 5], self)
+        @board[0][3] = Piece.new('queen', 'black', [0, 3], self)
+        @board[0][4] = Piece.new('king', 'black', [0, 4], self)
         @board[1].each_index do |index|
-            @board[1][index] = Piece.new('pawn', 'black', [1, index])
+            @board[1][index] = Piece.new('pawn', 'black', [1, index], self)
         end
     end
 
     def add_black_pieces
-        @board[7][0] = Piece.new('rook', 'white', [7, 0])
-        @board[7][7] = Piece.new('rook', 'white', [7, 7])
-        @board[7][1] = Piece.new('knight', 'white', [7, 1])
-        @board[7][6] = Piece.new('knight', 'white', [7, 6])
-        @board[7][2] = Piece.new('bishop', 'white', [7, 2])
-        @board[7][5] = Piece.new('bishop', 'white', [7, 5])
-        @board[7][3] = Piece.new('queen', 'white', [7, 3])
-        @board[7][4] = Piece.new('king', 'white', [7, 4])
+        @board[7][0] = Piece.new('rook', 'white', [7, 0], self)
+        @board[7][7] = Piece.new('rook', 'white', [7, 7], self)
+        @board[7][1] = Piece.new('knight', 'white', [7, 1], self)
+        @board[7][6] = Piece.new('knight', 'white', [7, 6], self)
+        @board[7][2] = Piece.new('bishop', 'white', [7, 2], self)
+        @board[7][5] = Piece.new('bishop', 'white', [7, 5], self)
+        @board[7][3] = Piece.new('queen', 'white', [7, 3], self)
+        @board[7][4] = Piece.new('king', 'white', [7, 4], self)
         @board[6].each_index do |index|
-            @board[6][index] = Piece.new('pawn', 'white', [6, index])
+            @board[6][index] = Piece.new('pawn', 'white', [6, index], self)
         end
     end
 end
 
 class Piece
     attr_accessor :symbol
-    def initialize(type, color, position)
+    def initialize(type, color, position, parent)
         @type = type
         @position = position
+        @color = color
+        @parent = parent
         assign_white_symbol if color == 'white'
         assign_black_symbol if color == 'black'
         assign_allowed_moves
@@ -150,11 +152,22 @@ class Piece
         when 'rook'
             @allowed_moves = @horizontal_vertical_moves
         when 'king'
-            @allowed_moves = [-1,0,1].permutation(2).to_a
+            @allowed_moves = @king_moves
         when 'queen'
             @allowed_moves = @diagonal_moves + @horizontal_vertical_moves
-            print @allowed_moves
         end
+    end
+
+    def possible_moves
+        before_move = @position
+        @moves_ary = []
+        @allowed_moves.each do |move|
+            position_after = [0, 0]
+            position_after[0] = before_move[0] + move[0]
+            position_after[1] = before_move[1] + move[1]
+            @moves_ary << position_after if move_valid?(position_after) && (@parent.board[position_after[0]][position_after[1]] == '*')
+        end
+        print @moves_ary
     end
 
     def create_move_arrays
@@ -174,12 +187,18 @@ class Piece
             @horizontal_vertical_moves << [0, i]
             i += 1
         end
+        @king_moves = [[1,-1],[1,0],[1,1],[-1,0],[1,0],[-1,-1],[-1,0],[-1,1]]
     end
 
-    def move_valid?
-        @position[0].between?(1, 8) && @position[1].between?(1, 8)
+    def move_valid?(position)
+        position[0].between?(0, 7) && position[1].between?(0, 7)
     end
+end
+
+class Player
+
 end
 
 board = Board.new
 board.print_board
+board.board[1][0].possible_moves
