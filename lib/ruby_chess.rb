@@ -1,3 +1,4 @@
+require 'pry-byebug'
 require 'colorize'
 
 module BoardPrinting
@@ -30,7 +31,7 @@ module BoardPrinting
             print " #{number} |"
             @board[row].each_index do |space|
                 if board[row][space] == '*'
-                    print " #{@board[row][space]} |"
+                    print "   |"
                 else
                     print " #{@board[row][space].symbol} |"
                 end
@@ -93,6 +94,7 @@ class Piece
         @position = position
         assign_white_symbol if color == 'white'
         assign_black_symbol if color == 'black'
+        assign_allowed_moves
     end
 
     def assign_white_symbol
@@ -128,9 +130,56 @@ class Piece
             @symbol = "\u265A"
         end
     end
+
+    def assign_allowed_moves
+        create_move_arrays
+        case @type
+        when 'pawn'
+            case @color
+            when 'black'
+                @allowed_moves = [[1,0], [2,0]]
+                @allowed_capture = [[1,1], [1,-1]]
+            when 'white'
+                @allowed_moves = [[-1,0], [-2,0]]
+                @allowed_capture = [[-1,1], [-1,-1]]
+            end
+        when 'knight'
+            @allowed_moves = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]]
+        when 'bishop'
+            @allowed_moves = @diagonal_moves
+        when 'rook'
+            @allowed_moves = @horizontal_vertical_moves
+        when 'king'
+            @allowed_moves = [-1,0,1].permutation(2).to_a
+        when 'queen'
+            @allowed_moves = @diagonal_moves + @horizontal_vertical_moves
+            print @allowed_moves
+        end
+    end
+
+    def create_move_arrays
+        @diagonal_moves = []
+        i = 1
+        1..7.times do
+            @diagonal_moves << [i,i]
+            @diagonal_moves << [-i,i]
+            @diagonal_moves << [i, -i]
+            @diagonal_moves << [-i,-i]
+            i += 1
+        end
+        @horizontal_vertical_moves = []
+        i = 1
+        1..7.times do
+            @horizontal_vertical_moves << [i, 0]
+            @horizontal_vertical_moves << [0, i]
+            i += 1
+        end
+    end
+
+    def move_valid?
+        @position[0].between?(1, 8) && @position[1].between?(1, 8)
+    end
 end
 
 board = Board.new
 board.print_board
-piece = Piece.new('pawn', 'black', [0,1])
-puts piece.symbol.encode('utf-8')
