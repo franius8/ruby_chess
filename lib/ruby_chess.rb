@@ -237,9 +237,13 @@ class Board
     @board[0][5] = Piece.new('bishop', 'black', [0, 5], self)
     @board[0][3] = Piece.new('queen', 'black', [0, 3], self)
     @board[0][4] = Piece.new('king', 'black', [0, 4], self)
+    add_white_pawns
+  end
+
+  def add_white_pawns
     @board[1].each_index do |index|
-      @board[1][index] = Piece.new('pawn', 'black', [1, index], self)
-    end
+        @board[1][index] = Piece.new('pawn', 'black', [1, index], self)
+      end
   end
 
   def add_black_pieces
@@ -251,6 +255,10 @@ class Board
     @board[7][5] = Piece.new('bishop', 'white', [7, 5], self)
     @board[7][3] = Piece.new('queen', 'white', [7, 3], self)
     @board[7][4] = Piece.new('king', 'white', [7, 4], self)
+    add_black_pawns
+  end
+
+  def add_black_pawns
     @board[6].each_index do |index|
       @board[6][index] = Piece.new('pawn', 'white', [6, index], self)
     end
