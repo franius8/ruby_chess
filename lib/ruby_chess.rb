@@ -3,10 +3,11 @@ require 'colorize'
 
 # Handles the printing of the board
 module BoardPrinting
-    def print_board
+
+    def print_board(position = [], moves = [])
         print_letters
         print_divider
-        print_rows_with_numbers
+        print_rows_with_numbers(position, moves)
         print_letters
     end
 
@@ -26,15 +27,23 @@ module BoardPrinting
         print "\n"
     end
 
-    def print_rows_with_numbers
+    def print_rows_with_numbers(position, moves)
         number = 1
         @board.each_index do |row|
             print " #{number} |"
             @board[row].each_index do |space|
-                if board[row][space] == '*'
+                if @board[row][space].class == String && moves.include?([row, space])
+                    print "   ".colorize(:color => :white, :background => :light_blue)
+                    print '|'
+                elsif board[row][space] == '*'
                     print "   |"
                 else
-                    print " #{@board[row][space].symbol} |"
+                    if position == @board[row][space].position
+                        print " #{@board[row][space].symbol} ".colorize(:color => :white, :background => :red)
+                        print '|'
+                    else
+                        print " #{@board[row][space].symbol} |"
+                    end
                 end
             end
             print " #{number}"
