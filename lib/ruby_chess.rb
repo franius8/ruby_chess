@@ -212,6 +212,51 @@ module PossibleMovesCreator
   WHITE_PAWN_CAPTURE = [[-1, 1], [-1, -1]].freeze
 end
 
+# Handles the printing of elements other than the board and getting variables
+module VariableGetter
+    def position_selector
+        loop do
+        print "Type the position of the piece you want to move: "
+        position = gets.chomp
+        transformed_position = transform_position(position)
+        return transformed_position if position_valid?(transformed_position)
+        print "Invalid selection. Reason: "
+        if !transformed_position[0].between?(0,7) || !transformed_position[1].between?(0,7)
+            print "Position outside range."
+        elsif @parent.board.board[transformed_position[0]][transformed_position[1]] == '*'
+            print 'Space empty.'
+        elsif @parent.board.board[transformed_position[0]][transformed_position[1]].color != @color
+            print "Space occupied by opponent's piece."
+        else
+            print 'Unspecified'
+        end
+        print "\n"
+    end
+    end
+
+    def transform_position(position)
+        transformed_position = []
+        transformed_position << position.slice(1).to_i - 1
+        transformed_position << position.slice(0).downcase.ord - 97
+    end
+
+    def position_valid?(transformed_position)
+        transformed_position[0].between?(0,7) && 
+        transformed_position[1].between?(0,7) &&
+        @parent.board.board[transformed_position[0]][transformed_position[1]] != '*' &&
+        @parent.board.board[transformed_position[0]][transformed_position[1]].color == @color
+    end
+end
+
+# Controls the entire game
+class Game
+    attr_accessor :board, :player
+    def initialize
+        @board = Board.new(self)
+        @player = Player.new('white', self)
+    end
+end
+
 # Contains the chess board with the chess pieces
 class Board
   include BoardPrinting
