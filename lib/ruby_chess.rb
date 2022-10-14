@@ -1,6 +1,7 @@
 require 'pry-byebug'
 require 'colorize'
 
+# Handles the printing of the board
 module BoardPrinting
     def print_board
         print_letters
@@ -44,6 +45,166 @@ module BoardPrinting
     end
 end
 
+
+# Assigns symbol to individual chess pieces
+module SymbolAssigner
+
+    def assign_white_symbol
+        case @type
+        when 'pawn'
+            @symbol = "\u2659"
+        when 'knight'
+            @symbol = "\u2658"
+        when 'bishop'
+            @symbol = "\u2657"
+        when 'rook'
+            @symbol = "\u2656"
+        when 'king'
+            @symbol = "\u2655"
+        when 'queen'
+            @symbol = "\u2654"
+        end
+    end
+
+    def assign_black_symbol
+        case @type
+        when 'pawn'
+            @symbol = "\u265F"
+        when 'knight'
+            @symbol = "\u265E"
+        when 'bishop'
+            @symbol = "\u265D"
+        when 'rook'
+            @symbol = "\u265C"
+        when 'king'
+            @symbol = "\u265B"
+        when 'queen'
+            @symbol = "\u265A"
+        end
+    end
+end
+
+# Creates the arrays of posible moves used by chess pieces
+module PossibleMovesCreator
+    def possible_moves_with_capture
+        @moves_ary = []
+        possible_moves_without_capture
+        possible_captures
+        print @moves_ary
+    end
+
+    def possible_moves_without_capture
+        before_move = @position
+        allowed_moves = @allowed_moves
+        case @type
+        when 'queen', 'rook', 'bishop'
+            possible_moves_for_dgvert(allowed_moves, before_move)
+        else
+            possible_moves_for_other(allowed_moves, before_move)
+        end
+    end
+
+    def possible_moves_for_dgvert(allowed_moves, before_move)
+        allowed_moves.each do |move_ary|
+            move_ary.each do |move|
+                position_after = [0, 0]
+                position_after[0] = before_move[0] + move[0]
+                position_after[1] = before_move[1] + move[1]
+                if move_valid?(position_after)
+                    @moves_ary << position_after
+                else
+                    break
+                end
+            end
+        end
+    end
+
+    def possible_moves_for_other(allowed_moves, before_move)
+        allowed_moves.each do |move|
+            position_after = [0, 0]
+            position_after[0] = before_move[0] + move[0]
+            position_after[1] = before_move[1] + move[1]
+            if move_valid?(position_after)
+                @moves_ary << position_after
+            else
+                break
+            end
+        end
+    end
+
+    def possible_captures
+        before_move = @position
+        if @allowed_capture.nil?
+            capture_ary = @allowed_moves
+        else
+            capture_ary = [@allowed_capture]
+        end
+        capture_ary.each do |capture|
+            capture.each do |move|
+                position_after = [0, 0]
+                position_after[0] = before_move[0] + move[0]
+                position_after[1] = before_move[1] + move[1]
+                if capture_valid?(position_after)
+                    @moves_ary << position_after
+                    break
+                else
+                    break
+                end
+            end
+        end
+    end
+
+    def create_move_arrays
+        @all_moves = []
+        create_diagonal_arrays
+        create_horizontal_vertical_arrays
+    end
+
+    def create_diagonal_arrays
+        diagonal_left_down, diagonal_left_up, diagonal_right_down, diagonal_right_up = [], [], [], []
+        i = 1
+        1..7.times do
+            diagonal_right_up << [i,i]
+            diagonal_right_down << [-i,i]
+            diagonal_left_up << [i, -i]
+            diagonal_left_down << [-i,-i]
+            i += 1
+        end
+        @all_moves << diagonal_left_down << diagonal_left_up << diagonal_right_down << diagonal_right_down
+    end    
+
+    def create_horizontal_vertical_arrays
+        horizontal_up, horizontal_down, vertical_up, vertical_down = [], [], [], []
+        i = 1
+        1..7.times do
+            horizontal_down << [i, 0]
+            vertical_down << [0, i]
+            vertical_up << [0, -i]
+            horizontal_up << [-i, 0]
+            i += 1
+        end
+        @all_moves << horizontal_down << horizontal_up << vertical_down << vertical_up
+    end
+
+    def move_valid?(position)
+        (position[0].between?(0, 7) && position[1].between?(0, 7)) &&
+        (@parent.board[position[0]][position[1]] == '*')
+    end
+
+    def capture_valid?(position)
+        (position[0].between?(0, 7) && position[1].between?(0, 7)) &&
+        (@parent.board[position[0]][position[1]] != '*') &&
+        (@parent.board[position[0]][position[1]].color != @color)
+    end
+
+    KING_MOVES = [[1,-1],[1,0],[1,1],[-1,0],[1,0],[-1,-1],[-1,0],[-1,1]]
+    BLACK_PAWN_MOVES = [[1,0], [2,0]]
+    BLACK_PAWN_CAPTURE = [[1,1], [1,-1]]
+    WHITE_PAWN_MOVES = [[-1,0], [-2,0]]
+    WHITE_PAWN_CAPTURE = [[-1,1], [-1,-1]]
+end
+
+# Contains the chess board with the chess pieces
 class Board
    include BoardPrinting
     attr_accessor :board
@@ -87,8 +248,11 @@ class Board
     end
 end
 
+# Individual chess piece
 class Piece
-    attr_accessor :symbol
+    include SymbolAssigner
+    include PossibleMovesCreator
+    attr_accessor :symbol, :color
     def initialize(type, color, position, parent)
         @type = type
         @position = position
@@ -99,100 +263,31 @@ class Piece
         assign_allowed_moves
     end
 
-    def assign_white_symbol
-        case @type
-        when 'pawn'
-            @symbol = "\u2659"
-        when 'knight'
-            @symbol = "\u2658"
-        when 'bishop'
-            @symbol = "\u2657"
-        when 'rook'
-            @symbol = "\u2656"
-        when 'king'
-            @symbol = "\u2655"
-        when 'queen'
-            @symbol = "\u2654"
-        end
-    end
-
-    def assign_black_symbol
-        case @type
-        when 'pawn'
-            @symbol = "\u265F"
-        when 'knight'
-            @symbol = "\u265E"
-        when 'bishop'
-            @symbol = "\u265D"
-        when 'rook'
-            @symbol = "\u265C"
-        when 'king'
-            @symbol = "\u265B"
-        when 'queen'
-            @symbol = "\u265A"
-        end
-    end
-
     def assign_allowed_moves
         create_move_arrays
         case @type
         when 'pawn'
             case @color
             when 'black'
-                @allowed_moves = [[1,0], [2,0]]
-                @allowed_capture = [[1,1], [1,-1]]
+                @allowed_moves = BLACK_PAWN_MOVES
+                @allowed_capture = BLACK_PAWN_MOVES
             when 'white'
-                @allowed_moves = [[-1,0], [-2,0]]
-                @allowed_capture = [[-1,1], [-1,-1]]
+                @allowed_moves = WHITE_PAWN_MOVES
+                @allowed_capture = WHITE_PAWN_CAPTURE
             end
         when 'knight'
             @allowed_moves = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]]
         when 'bishop'
-            @allowed_moves = @diagonal_moves
+            @allowed_moves = @all_moves[0..3]
         when 'rook'
-            @allowed_moves = @horizontal_vertical_moves
+            @allowed_moves = @all_moves[4..7]
         when 'king'
-            @allowed_moves = @king_moves
+            @allowed_moves = KING_MOVES
         when 'queen'
-            @allowed_moves = @diagonal_moves + @horizontal_vertical_moves
+            @allowed_moves = @all_moves
         end
     end
 
-    def possible_moves
-        before_move = @position
-        @moves_ary = []
-        @allowed_moves.each do |move|
-            position_after = [0, 0]
-            position_after[0] = before_move[0] + move[0]
-            position_after[1] = before_move[1] + move[1]
-            @moves_ary << position_after if move_valid?(position_after) && (@parent.board[position_after[0]][position_after[1]] == '*')
-        end
-        print @moves_ary
-    end
-
-    def create_move_arrays
-        @diagonal_moves = []
-        i = 1
-        1..7.times do
-            @diagonal_moves << [i,i]
-            @diagonal_moves << [-i,i]
-            @diagonal_moves << [i, -i]
-            @diagonal_moves << [-i,-i]
-            i += 1
-        end
-        @horizontal_vertical_moves = []
-        i = 1
-        1..7.times do
-            @horizontal_vertical_moves << [i, 0]
-            @horizontal_vertical_moves << [0, i]
-            i += 1
-        end
-        @king_moves = [[1,-1],[1,0],[1,1],[-1,0],[1,0],[-1,-1],[-1,0],[-1,1]]
-    end
-
-    def move_valid?(position)
-        position[0].between?(0, 7) && position[1].between?(0, 7)
-    end
 end
 
 class Player
@@ -201,4 +296,4 @@ end
 
 board = Board.new
 board.print_board
-board.board[1][0].possible_moves
+board.board[1][0].possible_moves_with_capture
