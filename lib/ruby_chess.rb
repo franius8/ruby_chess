@@ -179,7 +179,7 @@ module PossibleMovesCreator
       diagonal_left_down << [-i, -i]
       i += 1
     end
-    @all_moves << diagonal_left_down << diagonal_left_up << diagonal_right_down << diagonal_right_down
+    @all_moves << diagonal_left_down << diagonal_left_up << diagonal_right_down << diagonal_right_up
   end
 
   def create_horizontal_vertical_arrays
