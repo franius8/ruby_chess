@@ -133,7 +133,7 @@ module PossibleMovesCreator
     end
   
     def move_valid?(position)
-      (position[0].between?(0, 7) && position[1].between?(0, 7)) &&
+        (position[0].between?(0, 7) && position[1].between?(0, 7)) &&
         (@parent.board[position[0]][position[1]] == '*')
     end
   
@@ -145,7 +145,7 @@ module PossibleMovesCreator
   
     # Constants for special move arrays
     KNIGHT_MOVES = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]].freeze
-    KING_MOVES = [[1, -1], [1, 0], [1, 1], [-1, 0], [1, 0], [-1, -1], [-1, 0], [-1, 1]].freeze
+    KING_MOVES = [[1, -1], [1, 0], [1, 1], [-1, 0], [1, 0], [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1]].freeze
     BLACK_PAWN_MOVES = [[1, 0], [2, 0]].freeze
     BLACK_PAWN_CAPTURE = [[1, 1], [1, -1]].freeze
     WHITE_PAWN_MOVES = [[-1, 0], [-2, 0]].freeze
