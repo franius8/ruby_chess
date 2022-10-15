@@ -214,6 +214,8 @@ module PossibleMovesCreator
   BLACK_PAWN_CAPTURE = [[1, 1], [1, -1]].freeze
   WHITE_PAWN_MOVES = [[-1, 0], [-2, 0]].freeze
   WHITE_PAWN_CAPTURE = [[-1, 1], [-1, -1]].freeze
+  BLACK_PAWN_MOVES_AFTER_MOVE = [[1,0]].freeze
+  WHITE_PAWN_MOVES_AFTER_MOVE = [[-1,0]].freeze
 end
 
 # Handles the printing of elements other than the board and getting variables
@@ -279,6 +281,17 @@ module Printer
             print 'Invalid selection. Not a possible move.'
         end
     end
+
+    def transformation_message
+      loop do
+        print "Your pawn has reached the last line. Type the piece that you want to transform it into: "
+        piece = gets.chomp
+        return piece if PIECES.include?(piece)
+        print 'Invalid selection. Try again.'
+      end
+    end
+
+    PIECES = ['rook', 'knight', 'bishop', 'queen']
 end
 
 # Controls the entire game
@@ -383,6 +396,34 @@ class Piece
       @allowed_moves = @all_moves
     end
   end
+
+  def remove_excess_pawn_moves
+    if @type == 'pawn' && @allowed_moves.length == 2
+            case @color
+            when 'white'
+                @allowed_moves = WHITE_PAWN_MOVES_AFTER_MOVE
+            when 'black'
+                @allowed_moves = BLACK_PAWN_MOVES_AFTER_MOVE
+            end
+        end
+    end
+
+    def handle_pawn_transformation
+        if @type == 'pawn'
+            if @color == 'white' && @position[0] == 0
+                transform_pawn
+            elsif @color == 'black' && @position[0] == 7
+                transform_pawn
+            end
+        end
+    end
+
+    def transform_pawn
+      @type = transformation_message
+      assign_white_symbol if color == 'white'
+      assign_black_symbol if color == 'black'
+      assign_allowed_moves
+    end
 end
 
 # Class to handle interaction with players
