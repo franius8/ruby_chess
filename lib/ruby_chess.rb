@@ -66,6 +66,8 @@ module SymbolAssigner
     when 'rook'
       @symbol = "\u2656"
     when 'king'
+      @symbol = "\u2654"
+    when 'queen'
       @symbol = "\u2655"
     when 'queen'
       @symbol = "\u2654"
@@ -83,6 +85,8 @@ module SymbolAssigner
     when 'rook'
       @symbol = "\u265C"
     when 'king'
+      @symbol = "\u265A"
+    when 'queen'
       @symbol = "\u265B"
     when 'queen'
       @symbol = "\u265A"
