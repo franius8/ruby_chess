@@ -441,17 +441,23 @@ class Player
     @parent = parent
   end
 
+  def move_piece
+    selected_position, piece = select_piece
+    process_possible_moves(selected_position, piece)
+    process_move(selected_position, piece)
+    handle_check if check?(piece)
+  end
+
   def select_piece
     selected_position = position_selector
     piece = @parent.board.board[selected_position[0]][selected_position[1]]
-    process_possible_moves(selected_position,piece)
+    return selected_position, piece
   end
 
   def process_possible_moves(selected_position,piece)
     possible_moves = piece.possible_moves_with_capture
     @parent.board.print_board(selected_position,possible_moves)
     print_transformed_moves(piece)
-    process_move(selected_position, piece)
   end
 
   def process_move(selected_position, piece)
@@ -459,9 +465,8 @@ class Player
     @parent.board.board[selected_position[0]][selected_position[1]] = '*'
     @parent.board.board[selected_move[0]][selected_move[1]] = piece
     piece.position = selected_move
-    if piece.type == 'pawn'
-        piece.allowed_moves.pop
-    end
+    piece.remove_excess_pawn_moves
+    piece.handle_pawn_transformation
     @parent.board.print_board
   end
 
