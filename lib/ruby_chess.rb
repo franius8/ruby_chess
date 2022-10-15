@@ -213,20 +213,23 @@ module PossibleMovesCreator
 end
 
 # Handles the printing of elements other than the board and getting variables
-module VariableGetter
+module Printer
     def position_selector
         loop do
         print "Type the position of the piece you want to move: "
         position = gets.chomp
-        transformed_position = transform_position(position)
-        return transformed_position if position_valid?(transformed_position)
+        transformed_position = transform_position_from_user(position)
+        piece = @parent.board.board[transformed_position[0]][transformed_position[1]]
+        return transformed_position if position_valid?(transformed_position, piece)
         print "Invalid selection. Reason: "
         if !transformed_position[0].between?(0,7) || !transformed_position[1].between?(0,7)
             print "Position outside range."
-        elsif @parent.board.board[transformed_position[0]][transformed_position[1]] == '*'
+        elsif piece == '*'
             print 'Space empty.'
-        elsif @parent.board.board[transformed_position[0]][transformed_position[1]].color != @color
+        elsif piece.color != @color
             print "Space occupied by opponent's piece."
+        elsif piece.possible_moves_with_capture.empty?
+            print 'No possible moves.'
         else
             print 'Unspecified'
         end
@@ -234,17 +237,43 @@ module VariableGetter
     end
     end
 
-    def transform_position(position)
+    def transform_position_from_user(position)
         transformed_position = []
         transformed_position << position.slice(1).to_i - 1
         transformed_position << position.slice(0).downcase.ord - 97
     end
 
-    def position_valid?(transformed_position)
+    def transform_position_to_user(move)
+        transformed_move = ''
+        transformed_move += move[0].to_s
+        transformed_move += (move[1]+97).chr
+    end
+
+    def position_valid?(transformed_position, piece)
         transformed_position[0].between?(0,7) && 
         transformed_position[1].between?(0,7) &&
         @parent.board.board[transformed_position[0]][transformed_position[1]] != '*' &&
-        @parent.board.board[transformed_position[0]][transformed_position[1]].color == @color
+        @parent.board.board[transformed_position[0]][transformed_position[1]].color == @color &&
+        !piece.possible_moves_with_capture.empty?
+    end
+
+    def print_transformed_moves(piece)
+        print "You may move to the following positions:"
+        piece.possible_moves_with_capture.each do |move|
+            transformed_move = transform_position_to_user(move)
+            print " #{transformed_move}"
+        end
+        print "\n"
+    end
+
+    def move_selector(piece)
+        loop do
+            print 'Type the position to which you want to move: '
+            move = gets.chomp
+            transformed_move = transform_position_from_user(move)
+            return transformed_move if piece.moves_ary.include?(transformed_move)
+            print 'Invalid selection. Not a possible move.'
+        end
     end
 end
 
@@ -354,10 +383,37 @@ end
 
 # Class to handle interaction with players
 class Player
+  include Printer
+  
   def initialize(color, parent)
     @color = color
     @parent = parent
   end
+
+  def select_piece
+    selected_position = position_selector
+    piece = @parent.board.board[selected_position[0]][selected_position[1]]
+    process_possible_moves(selected_position,piece)
+  end
+
+  def process_possible_moves(selected_position,piece)
+    possible_moves = piece.possible_moves_with_capture
+    @parent.board.print_board(selected_position,possible_moves)
+    print_transformed_moves(piece)
+    process_move(selected_position, piece)
+  end
+
+  def process_move(selected_position, piece)
+    selected_move = move_selector(piece)
+    @parent.board.board[selected_position[0]][selected_position[1]] = '*'
+    @parent.board.board[selected_move[0]][selected_move[1]] = piece
+    piece.position = selected_move
+    if piece.type == 'pawn'
+        piece.allowed_moves.pop
+    end
+    @parent.board.print_board
+  end
+
 end
 
 board = Board.new
