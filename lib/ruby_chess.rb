@@ -495,6 +495,18 @@ class Player
     @parent.board.print_board
   end
 
+  def check?(piece)
+    piece.possible_moves_with_capture
+    binding.pry
+    piece.moves_ary.each do |move|
+      space = @parent.board.board[move[0]][move[1]]
+      if space.instance_of?(Piece) && space.type = 'king' && space.color != @color
+        return true
+        print 'check'
+      end
+    end
+    false
+  end
 end
 
 board = Board.new
