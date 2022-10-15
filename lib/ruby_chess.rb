@@ -8,29 +8,14 @@ require_relative 'symbol_assigner'
 require_relative 'possible_moves_creator'
 require_relative 'printer'
 
-# Handles the printing of elements other than the board and getting variables
-module Printer
-    def position_selector
-        loop do
-        print "Type the position of the piece you want to move: "
-        position = gets.chomp
-        transformed_position = transform_position_from_user(position)
-        piece = @parent.board.board[transformed_position[0]][transformed_position[1]]
-        return transformed_position if position_valid?(transformed_position, piece)
-        print "Invalid selection. Reason: "
-        if !transformed_position[0].between?(0,7) || !transformed_position[1].between?(0,7)
-            print "Position outside range."
-        elsif piece == '*'
-            print 'Space empty.'
-        elsif piece.color != @color
-            print "Space occupied by opponent's piece."
-        elsif piece.possible_moves_with_capture.empty?
-            print 'No possible moves.'
-        else
-            print 'Unspecified'
-        end
-        print "\n"
-    end
+# Controls game-level methods and victory conditions
+class Game
+    attr_accessor :board, :player
+    def initialize
+        @board = Board.new(self)
+        @player1 = Player.new('white', self)
+        @player2 = Player.new('black', self)
+        #play_game
     end
 
     def transform_position_from_user(position)
