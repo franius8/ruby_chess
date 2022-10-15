@@ -38,6 +38,9 @@ module BoardPrinting
           print '|'
         elsif board[row][space] == '*'
           print '   |'
+        elsif moves.include?([row, space])
+            print  " #{@board[row][space].symbol} ".colorize(color: :white, background: :magenta)
+            print '|'
         elsif position == @board[row][space].position
           print " #{@board[row][space].symbol} ".colorize(color: :white, background: :red)
           print '|'
@@ -69,8 +72,6 @@ module SymbolAssigner
       @symbol = "\u2654"
     when 'queen'
       @symbol = "\u2655"
-    when 'queen'
-      @symbol = "\u2654"
     end
   end
 
@@ -88,21 +89,21 @@ module SymbolAssigner
       @symbol = "\u265A"
     when 'queen'
       @symbol = "\u265B"
-    when 'queen'
-      @symbol = "\u265A"
     end
   end
 end
 
 # Creates the arrays of posible moves used by chess pieces
 module PossibleMovesCreator
+  # Array of possible moves with possible captures
   def possible_moves_with_capture
     @moves_ary = []
     possible_moves_without_capture
     possible_captures
-    print @moves_ary
+    @moves_ary
   end
 
+  # Array of possible moves without captures
   def possible_moves_without_capture
     before_move = @position
     allowed_moves = @allowed_moves
@@ -114,6 +115,7 @@ module PossibleMovesCreator
     end
   end
 
+  # Possible moves for pieces moving diagonally and/or vertically
   def possible_moves_for_dgvert(allowed_moves, before_move)
     allowed_moves.each do |move_ary|
       move_ary.each do |move|
@@ -129,6 +131,7 @@ module PossibleMovesCreator
     end
   end
 
+  # Possible moves for pieces with their own special move arrays
   def possible_moves_for_other(allowed_moves, before_move)
     allowed_moves.each do |move|
       position_after = [0, 0]
@@ -136,12 +139,11 @@ module PossibleMovesCreator
       position_after[1] = before_move[1] + move[1]
       if move_valid?(position_after)
         @moves_ary << position_after
-      else
-        break
       end
     end
   end
 
+  # Array of possible captures
   def possible_captures
     before_move = @position
     capture_ary = if @allowed_capture.nil?
@@ -166,6 +168,7 @@ module PossibleMovesCreator
     create_horizontal_vertical_arrays
   end
 
+  # Creation of all diagonal move arrays - each possibility separately
   def create_diagonal_arrays
     diagonal_left_down = []
     diagonal_left_up = []
@@ -182,6 +185,7 @@ module PossibleMovesCreator
     @all_moves << diagonal_left_down << diagonal_left_up << diagonal_right_down << diagonal_right_up
   end
 
+  # Creation of all horizontal and vertical arrays - each possibility separately
   def create_horizontal_vertical_arrays
     horizontal_up = []
     horizontal_down = []
@@ -209,6 +213,8 @@ module PossibleMovesCreator
       (@parent.board[position[0]][position[1]].color != @color)
   end
 
+  # Constants for special move arrays
+  KNIGHT_MOVES = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]].freeze
   KING_MOVES = [[1, -1], [1, 0], [1, 1], [-1, 0], [1, 0], [-1, -1], [-1, 0], [-1, 1]].freeze
   BLACK_PAWN_MOVES = [[1, 0], [2, 0]].freeze
   BLACK_PAWN_CAPTURE = [[1, 1], [1, -1]].freeze
@@ -251,8 +257,8 @@ module Printer
 
     def transform_position_to_user(move)
         transformed_move = ''
-        transformed_move += move[0].to_s
         transformed_move += (move[1]+97).chr
+        transformed_move += (move[0]+1).to_s
     end
 
     def position_valid?(transformed_position, piece)
@@ -278,7 +284,7 @@ module Printer
             move = gets.chomp
             transformed_move = transform_position_from_user(move)
             return transformed_move if piece.moves_ary.include?(transformed_move)
-            print 'Invalid selection. Not a possible move.'
+            print "Invalid selection. Not a possible move.\n"
         end
     end
 
@@ -294,7 +300,7 @@ module Printer
     PIECES = ['rook', 'knight', 'bishop', 'queen']
 end
 
-# Controls the entire game
+# Controls game-level methods and victory conditions
 class Game
     attr_accessor :board, :player
     def initialize
