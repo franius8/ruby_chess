@@ -149,19 +149,44 @@ module PossibleMovesCreator
     capture_ary = if @allowed_capture.nil?
                     @allowed_moves
                   else
-                    [@allowed_capture]
+                    @allowed_capture
                   end
+    case @type
+    when 'queen', 'rook', 'bishop'
+      possible_captures_for_dgvert(capture_ary, before_move)
+    else
+      possible_captures_for_other(capture_ary, before_move)
+    end
+  end
+
+  # Possible captures for pieces moving diagonally and/or vertically
+  def possible_captures_for_dgvert(capture_ary, before_move)
     capture_ary.each do |capture|
       capture.each do |move|
         position_after = [0, 0]
         position_after[0] = before_move[0] + move[0]
         position_after[1] = before_move[1] + move[1]
-        @moves_ary << position_after if capture_valid?(position_after)
-        break
+        if capture_valid?(position_after)
+          @moves_ary << position_after
+          break
+        end
       end
     end
   end
 
+  # Possible captures for pieces with their own special move arrays
+  def possible_captures_for_other(capture_ary, before_move)
+    capture_ary.each do |move|
+      position_after = [0, 0]
+      position_after[0] = before_move[0] + move[0]
+      position_after[1] = before_move[1] + move[1]
+      if capture_valid?(position_after)
+        @moves_ary << position_after
+      end
+    end
+  end
+
+  # Creation of template move arrays for all figures
   def create_move_arrays
     @all_moves = []
     create_diagonal_arrays
