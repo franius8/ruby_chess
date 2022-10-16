@@ -40,6 +40,9 @@ module BoardPrinting
         elsif position == @board[row][space].position
           print " #{@board[row][space].symbol} ".colorize(color: :white, background: :red)
           print '|'
+        elsif @board[row][space].color == 'black'
+          print " #{@board[row][space].symbol} ".colorize(color: :light_black)
+          print '|'
         else
           print " #{@board[row][space].symbol} |"
         end
