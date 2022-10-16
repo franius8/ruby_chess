@@ -1,10 +1,18 @@
 # frozen_string_literal: true
 
 require 'pry-byebug'
-require 'colorize'
-require 'yaml'
+require 'colorize' # Required to display the board correctly
+require 'yaml' # Required to save and load the game
 
+# Classes
 require_relative 'game'
+require_relative 'board'
+require_relative 'piece'
+require_relative 'player'
+require_relative 'saveload'
+
+# Modules
+
 require_relative 'board_printing'
 require_relative 'symbol_assigner'
 require_relative 'possible_moves_creator'
@@ -23,3 +31,8 @@ class Chess
     game = Game.new
   end
   game.play_game
+end
+
+end
+
+Chess.new
