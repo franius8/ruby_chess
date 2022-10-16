@@ -1,6 +1,10 @@
 # Handles the printing of elements other than the board and getting variables
 module Printer
-  def position_selector
+    def message_before_move(player)
+        puts "Turn of the #{player.color} player."
+    end
+  
+    def position_selector
     loop do
       print 'Type the position of the piece you want to move: '
       position = gets.chomp
@@ -48,7 +52,7 @@ module Printer
 
   def print_transformed_moves(piece)
     print 'You may move to the following positions:'
-    piece.possible_moves_with_capture.each do |move|
+    piece.possible_moves_with_capture.uniq.sort.each do |move|
       transformed_move = transform_position_to_user(move)
       print " #{transformed_move}"
     end

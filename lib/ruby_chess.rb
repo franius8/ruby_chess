@@ -13,7 +13,7 @@ require_relative 'player'
 
 # Controls game-level methods and victory conditions
 class Game
-  include 'printer'
+  include Printer
   
   attr_accessor :board, :player, :mate, :mated_color
 
@@ -28,11 +28,22 @@ class Game
 
   def play_game
     board.print_board
+    current_player = @player1
     until @mate == true
-      @player1.move_piece
-      @player2.move_piece
+      message_before_move(current_player)
+      current_player.move_piece
+      current_player = switch_current_player(current_player)
     end
     mate_message(@mated_color)
+  end
+
+  def switch_current_player(current_player)
+    case current_player.color
+    when 'black'
+      @player1
+    when 'white'
+      @player2
+    end
   end
 
   def determine_checked_player(player, piece)
