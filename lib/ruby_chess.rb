@@ -147,7 +147,9 @@ end
 class Piece
   include SymbolAssigner
   include PossibleMovesCreator
-  attr_accessor :symbol, :color, :position
+  include Printer
+  attr_accessor :symbol, :color, :position, :moves_ary, :allowed_moves
+  attr_reader :type
 
   def initialize(type, color, position, parent)
     @type = type
@@ -172,7 +174,7 @@ class Piece
         @allowed_capture = WHITE_PAWN_CAPTURE
       end
     when 'knight'
-      @allowed_moves = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]]
+      @allowed_moves = KNIGHT_MOVES
     when 'bishop'
       @allowed_moves = @all_moves[0..3]
     when 'rook'
@@ -186,30 +188,30 @@ class Piece
 
   def remove_excess_pawn_moves
     if @type == 'pawn' && @allowed_moves.length == 2
-            case @color
-            when 'white'
-                @allowed_moves = WHITE_PAWN_MOVES_AFTER_MOVE
-            when 'black'
-                @allowed_moves = BLACK_PAWN_MOVES_AFTER_MOVE
-            end
-        end
+      case @color
+      when 'white'
+        @allowed_moves = WHITE_PAWN_MOVES_AFTER_MOVE
+      when 'black'
+        @allowed_moves = BLACK_PAWN_MOVES_AFTER_MOVE
+      end
     end
+  end
 
-    def handle_pawn_transformation
-        if @type == 'pawn'
-            if @color == 'white' && @position[0] == 0
-                transform_pawn
-            elsif @color == 'black' && @position[0] == 7
-                transform_pawn
-            end
-        end
+  def handle_pawn_transformation
+    if @type == 'pawn'
+      if @color == 'white' && @position[0] == 0
+        transform_pawn
+      elsif @color == 'black' && @position[0] == 7
+        transform_pawn
+      end
     end
+  end
 
-    def transform_pawn
-      @type = transformation_message
-      assign_white_symbol if color == 'white'
-      assign_black_symbol if color == 'black'
-      assign_allowed_moves
+  def transform_pawn
+    @type = transformation_message
+    assign_white_symbol if color == 'white'
+    assign_black_symbol if color == 'black'
+    assign_allowed_moves
     end
 end
 
