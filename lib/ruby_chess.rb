@@ -10,6 +10,7 @@ require_relative 'printer'
 require_relative 'board'
 require_relative 'piece'
 require_relative 'player'
+require_relative 'saveload'
 
 # Controls game-level methods and victory conditions
 class Game
