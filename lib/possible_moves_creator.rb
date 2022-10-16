@@ -168,14 +168,14 @@ module PossibleMovesCreator
     return result
   end
 
-  
-    # Constants for special move arrays
-    KNIGHT_MOVES = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]].freeze
-    KING_MOVES = [[1, -1], [1, 0], [1, 1], [-1, 0], [1, 0], [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1]].freeze
-    BLACK_PAWN_MOVES = [[1, 0], [2, 0]].freeze
-    BLACK_PAWN_CAPTURE = [[1, 1], [1, -1]].freeze
-    WHITE_PAWN_MOVES = [[-1, 0], [-2, 0]].freeze
-    WHITE_PAWN_CAPTURE = [[-1, 1], [-1, -1]].freeze
-    BLACK_PAWN_MOVES_AFTER_MOVE = [[1,0]].freeze
-    WHITE_PAWN_MOVES_AFTER_MOVE = [[-1,0]].freeze
-  end
+
+  # Constants for special move arrays
+  KNIGHT_MOVES = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]].freeze
+  KING_MOVES = [[1, -1], [1, 0], [1, 1], [-1, 0], [1, 0], [-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1]].freeze
+  BLACK_PAWN_MOVES = [[1, 0], [2, 0]].freeze
+  BLACK_PAWN_CAPTURE = [[1, 1], [1, -1]].freeze
+  WHITE_PAWN_MOVES = [[-1, 0], [-2, 0]].freeze
+  WHITE_PAWN_CAPTURE = [[-1, 1], [-1, -1]].freeze
+  BLACK_PAWN_MOVES_AFTER_MOVE = [[1, 0]].freeze
+  WHITE_PAWN_MOVES_AFTER_MOVE = [[-1, 0]].freeze
+end
