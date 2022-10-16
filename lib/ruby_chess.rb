@@ -10,72 +10,32 @@ require_relative 'printer'
 
 # Controls game-level methods and victory conditions
 class Game
-    attr_accessor :board, :player
-    def initialize
-        @board = Board.new(self)
-        @player1 = Player.new('white', self)
-        @player2 = Player.new('black', self)
-        #play_game
-    end
+  attr_accessor :board, :player
 
-    def transform_position_from_user(position)
-        transformed_position = []
-        transformed_position << position.slice(1).to_i - 1
-        transformed_position << position.slice(0).downcase.ord - 97
-    end
+  def initialize
+    @board = Board.new(self)
+    @player1 = Player.new('white', self)
+    @player2 = Player.new('black', self)
+    @mate = false
+    # play_game
+  end
 
-    def transform_position_to_user(move)
-        transformed_move = ''
-        transformed_move += (move[1]+97).chr
-        transformed_move += (move[0]+1).to_s
+  def play_game
+    board.print_board
+    until @mate == true
+      @player1.move_piece
+      @player2.move_piece
     end
+  end
 
-    def position_valid?(transformed_position, piece)
-        transformed_position[0].between?(0,7) && 
-        transformed_position[1].between?(0,7) &&
-        @parent.board.board[transformed_position[0]][transformed_position[1]] != '*' &&
-        @parent.board.board[transformed_position[0]][transformed_position[1]].color == @color &&
-        !piece.possible_moves_with_capture.empty?
+  def determine_checked_player(player, piece)
+    case player.color
+    when 'black'
+      @player1.check = true
+    when 'white'
+      @player2.check = true
     end
-
-    def print_transformed_moves(piece)
-        print "You may move to the following positions:"
-        piece.possible_moves_with_capture.each do |move|
-            transformed_move = transform_position_to_user(move)
-            print " #{transformed_move}"
-        end
-        print "\n"
-    end
-
-    def move_selector(piece)
-        loop do
-            print 'Type the position to which you want to move: '
-            move = gets.chomp
-            transformed_move = transform_position_from_user(move)
-            return transformed_move if piece.moves_ary.include?(transformed_move)
-            print "Invalid selection. Not a possible move.\n"
-        end
-    end
-
-    def transformation_message
-      loop do
-        print "Your pawn has reached the last line. Type the piece that you want to transform it into: "
-        piece = gets.chomp
-        return piece if PIECES.include?(piece)
-        print 'Invalid selection. Try again.'
-      end
-    end
-
-    PIECES = ['rook', 'knight', 'bishop', 'queen']
-end
-
-# Controls game-level methods and victory conditions
-class Game
-    attr_accessor :board, :player
-    def initialize
-        @board = Board.new(self)
-        @player = Player.new('white', self)
-    end
+  end
 end
 
 # Contains the chess board with the chess pieces
@@ -212,34 +172,39 @@ class Piece
     assign_white_symbol if color == 'white'
     assign_black_symbol if color == 'black'
     assign_allowed_moves
-    end
+    @allowed_capture = nil
+  end
 end
 
 # Class to handle interaction with players
 class Player
   include Printer
-  
+
+  attr_accessor :color, :check
+
   def initialize(color, parent)
     @color = color
     @parent = parent
+    @check = false
   end
 
   def move_piece
     selected_position, piece = select_piece
     process_possible_moves(selected_position, piece)
     process_move(selected_position, piece)
+    @check = false
     handle_check if check?(piece)
   end
 
   def select_piece
     selected_position = position_selector
     piece = @parent.board.board[selected_position[0]][selected_position[1]]
-    return selected_position, piece
+    [selected_position, piece]
   end
 
-  def process_possible_moves(selected_position,piece)
+  def process_possible_moves(selected_position, piece)
     possible_moves = piece.possible_moves_with_capture
-    @parent.board.print_board(selected_position,possible_moves)
+    @parent.board.print_board(selected_position, possible_moves)
     print_transformed_moves(piece)
   end
 
@@ -255,19 +220,19 @@ class Player
 
   def check?(piece)
     piece.possible_moves_with_capture
-    binding.pry
     piece.moves_ary.each do |move|
-      space = @parent.board.board[move[0]][move[1]]
-      if space.instance_of?(Piece) && space.type = 'king' && space.color != @color
-        return true
-        print 'check'
-      end
+      @space = @parent.board.board[move[0]][move[1]]
+      return true if @space.instance_of?(Piece) && @space.type == 'king' && @space.color != @color
     end
     false
   end
+
+  def handle_check
+    check_message # This needs to be finished
+    @parent.determine_checked_player(self, @space)
+  end
 end
 
-board = Board.new
-board.print_board
-board.print_board([1, 0], [[2, 0], [3, 0]])
-board.board[1][0].possible_moves_with_capture
+game = Game.new
+game.board.board[4][2] = Piece.new('king', 'black', [4, 2], game.board)
+game.play_game
