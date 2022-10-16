@@ -77,7 +77,16 @@ module Printer
   end
 
   def check_message
-    puts 'Check!'
+    print "+-------------------------------------+\n"
+    print "|               Check!                |\n"
+    print "+-------------------------------------+\n"
+  end
+
+  def mate_message(mated_color)
+    print "+-------------------------------------+\n"
+    print "|               Mate!                 |\n"
+    print "+-------------------------------------+\n"
+    print "The game ended with a mate and #{mated_color} lost."
   end
 
   PIECES = %w[rook knight bishop queen]
