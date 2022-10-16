@@ -17,7 +17,7 @@ class Piece
     end
   
     def assign_allowed_moves
-      create_move_arrays
+      all_moves = create_move_arrays
       case @type
       when 'pawn'
         case @color
@@ -31,13 +31,13 @@ class Piece
       when 'knight'
         @allowed_moves = KNIGHT_MOVES
       when 'bishop'
-        @allowed_moves = @all_moves[0..3]
+        @allowed_moves = all_moves[0..3]
       when 'rook'
-        @allowed_moves = @all_moves[4..7]
+        @allowed_moves = all_moves[4..7]
       when 'king'
         @allowed_moves = KING_MOVES
       when 'queen'
-        @allowed_moves = @all_moves
+        @allowed_moves = all_moves
       end
     end
   

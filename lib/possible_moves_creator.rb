@@ -92,13 +92,14 @@ module PossibleMovesCreator
 
   # Creation of template move arrays for all figures
   def create_move_arrays
-    @all_moves = []
-    create_diagonal_arrays
-    create_horizontal_vertical_arrays
+    all_moves = []
+    all_moves = create_diagonal_arrays(all_moves)
+    all_moves = create_horizontal_vertical_arrays(all_moves)
+    all_moves
   end
 
   # Creation of all diagonal move arrays - each possibility separately
-  def create_diagonal_arrays
+  def create_diagonal_arrays(all_moves)
     diagonal_left_down = []
     diagonal_left_up = []
     diagonal_right_down = []
@@ -111,11 +112,11 @@ module PossibleMovesCreator
       diagonal_left_down << [-i, -i]
       i += 1
     end
-    @all_moves << diagonal_left_down << diagonal_left_up << diagonal_right_down << diagonal_right_up
+    all_moves << diagonal_left_down << diagonal_left_up << diagonal_right_down << diagonal_right_up
   end
 
   # Creation of all horizontal and vertical arrays - each possibility separately
-  def create_horizontal_vertical_arrays
+  def create_horizontal_vertical_arrays(all_moves)
     horizontal_up = []
     horizontal_down = []
     vertical_up = []
@@ -128,7 +129,7 @@ module PossibleMovesCreator
       horizontal_up << [-i, 0]
       i += 1
     end
-    @all_moves << horizontal_down << horizontal_up << vertical_down << vertical_up
+    all_moves << horizontal_down << horizontal_up << vertical_down << vertical_up
   end
 
   def move_valid?(position)
