@@ -18,11 +18,11 @@ class Game
 
   def play_game
     board.print_board
-    current_player = @player1 if @current_player.nil?
+    @current_player = @player1 if @current_player.nil?
     until @mate == true
-      message_before_move(current_player)
-      current_player.move_piece
-      current_player = switch_current_player(current_player)
+      message_before_move(@current_player)
+      @current_player.move_piece
+      @current_player = switch_current_player(@current_player)
     end
     mate_message(@mated_color)
   end

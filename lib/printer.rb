@@ -11,23 +11,27 @@ module Printer
     loop do
       print 'Enter the name of the save to load (case insensitive): '
       loadfile_name = gets.chomp.downcase
-      return loadfile_name if File.exist?(loadfile_name)
+      return loadfile_name if File.exist?("saves/#{loadfile_name}.yml")
 
       puts 'No file found. Try again'
     end
   end
 
   def no_directory_message
-    puts 'No saves directory found.'
+    puts 'Saves directory not found or empty!'
   end
 
   def collect_and_check_savefile_name
     loop do
       print 'Enter the name of your save. Only letters are allowed up to 12 characters (case insensitive): '
       savefile_name = gets.chomp.downcase
-      return savefile_name if savefile_name_valid?(savefile_name)
+      return savefile_name if savefile_name_valid?(savefile_name) && !File.exist?("saves/#{savefile_name}.yml")
 
-      puts 'Incorrect save name. Enter it again.'
+      if File.exist?("saves/#{savefile_name}.yml")
+        puts 'Save already exists'
+      else
+        puts 'Incorrect save name. Enter it again.'
+      end
     end
   end
 
@@ -43,6 +47,7 @@ module Printer
     loop do
       print 'Type the position of the piece you want to move: '
       position = gets.chomp
+      return SaveLoad.new.save(@parent) if position == 'save'
       transformed_position = transform_position_from_user(position)
       piece = @parent.board.board[transformed_position[0]][transformed_position[1]]
       return transformed_position if position_valid?(transformed_position, piece) && @check == false
