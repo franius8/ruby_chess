@@ -13,13 +13,16 @@ require_relative 'player'
 
 # Controls game-level methods and victory conditions
 class Game
-  attr_accessor :board, :player
+  include 'printer'
+  
+  attr_accessor :board, :player, :mate, :mated_color
 
   def initialize
     @board = Board.new(self)
     @player1 = Player.new('white', self)
     @player2 = Player.new('black', self)
     @mate = false
+    @mated_color = ''
     # play_game
   end
 
@@ -29,6 +32,7 @@ class Game
       @player1.move_piece
       @player2.move_piece
     end
+    mate_message(@mated_color)
   end
 
   def determine_checked_player(player, piece)
@@ -42,5 +46,9 @@ class Game
 end
 
 game = Game.new
-game.board.board[4][2] = Piece.new('king', 'black', [4, 2], game.board)
+game.board.board[0][4] = '*'
+game.board.pieces_ary.reject! {|piece| piece.type == 'king' && piece.color == 'black'}
+black_king = Piece.new('king', 'black', [4, 2], game.board)
+game.board.board[4][2] = black_king
+game.board.pieces_ary << black_king
 game.play_game

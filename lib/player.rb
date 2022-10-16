@@ -11,6 +11,11 @@ class Player
     end
   
     def move_piece
+        if @check == true && mate?
+        @parent.mate = true
+        @parent.mated_color = @color
+        return
+      end
       selected_position, piece = select_piece
       process_possible_moves(selected_position, piece)
       process_move(selected_position, piece)
@@ -50,7 +55,14 @@ class Player
     end
   
     def handle_check
-      check_message # This needs to be finished
+      check_message
       @parent.determine_checked_player(self, @space)
+    end
+
+    def mate?
+        kings = @parent.board.pieces_ary.select {|piece| piece.type == 'king'}
+        player_king = kings.find {|king| king.color == @color}
+        return true if player_king.possible_moves_with_capture.empty?
+        false
     end
   end
