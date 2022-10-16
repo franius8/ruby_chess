@@ -1,6 +1,40 @@
-# Handles the printing of elements other than the board and getting variables
-module Printer
-    def message_before_move(player)
+# Handles the printing of elements other than the board and getting variables from the player
+module Printer 
+  
+  def load_saved_game?
+    print 'Do you want to load a saved game? Type Y to load, anything else to play a new game: '
+    return true if gets.chomp.downcase == 'y'
+  end 
+
+  def collect_loadfile_name
+    loop do
+    print 'Enter the name of the save to load (case insensitive): '
+    loadfile_name = gets.chomp.downcase
+    return loadfile_name if File.exist?(loadfile_name)
+
+      puts "No file found. Try again"
+    end
+  end
+
+  def no_directory_message
+    puts 'No saves directory found.'
+  end
+
+  def collect_and_check_savefile_name
+    loop do
+      print 'Enter the name of your save. Only letters are allowed up to 12 characters (case insensitive): '
+      savefile_name = gets.chomp.downcase
+      return savefile_name if savefile_name_valid?(savefile_name)
+
+      puts 'Incorrect save name. Enter it again.'
+    end
+  end
+
+  def succesful_save_message
+    puts 'Game saved succesfully.'
+  end
+
+  def message_before_move(player)
         puts "Turn of the #{player.color} player."
     end
   
