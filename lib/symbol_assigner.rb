@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Assigns symbol to individual chess pieces
 module SymbolAssigner
   def assign_white_symbol

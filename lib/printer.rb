@@ -1,18 +1,19 @@
+# frozen_string_literal: true
+
 # Handles the printing of elements other than the board and getting variables from the player
-module Printer 
-  
+module Printer
   def load_saved_game?
     print 'Do you want to load a saved game? Type Y to load, anything else to play a new game: '
     return true if gets.chomp.downcase == 'y'
-  end 
+  end
 
   def collect_loadfile_name
     loop do
-    print 'Enter the name of the save to load (case insensitive): '
-    loadfile_name = gets.chomp.downcase
-    return loadfile_name if File.exist?(loadfile_name)
+      print 'Enter the name of the save to load (case insensitive): '
+      loadfile_name = gets.chomp.downcase
+      return loadfile_name if File.exist?(loadfile_name)
 
-      puts "No file found. Try again"
+      puts 'No file found. Try again'
     end
   end
 
@@ -35,10 +36,10 @@ module Printer
   end
 
   def message_before_move(player)
-        puts "Turn of the #{player.color} player."
-    end
-  
-    def position_selector
+    puts "Turn of the #{player.color} player."
+  end
+
+  def position_selector
     loop do
       print 'Type the position of the piece you want to move: '
       position = gets.chomp
@@ -46,6 +47,7 @@ module Printer
       piece = @parent.board.board[transformed_position[0]][transformed_position[1]]
       return transformed_position if position_valid?(transformed_position, piece) && @check == false
       return transformed_position if piece.type == 'king' && @check == true
+
       print 'Invalid selection. Reason: '
       if !transformed_position[0].between?(0, 7) || !transformed_position[1].between?(0, 7)
         print 'Position outside range.'
@@ -56,7 +58,7 @@ module Printer
       elsif piece.possible_moves_with_capture.empty?
         print 'No possible moves.'
       elsif piece.type != 'king' && @check == true
-        print "Only the king may be moved in check."
+        print 'Only the king may be moved in check.'
       else
         print 'Unspecified'
       end
@@ -127,5 +129,5 @@ module Printer
     print "The game ended with a mate and #{mated_color} lost."
   end
 
-  PIECES = %w[rook knight bishop queen]
+  PIECES = %w[rook knight bishop queen].freeze
 end

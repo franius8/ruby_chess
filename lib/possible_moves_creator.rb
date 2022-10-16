@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Creates the arrays of posible moves used by chess pieces
 module PossibleMovesCreator
   # Array of possible moves with possible captures
@@ -73,9 +75,7 @@ module PossibleMovesCreator
           @moves_ary << position_after
           break
         end
-        unless move_valid?(position_after)
-            break
-        end
+        break unless move_valid?(position_after)
       end
     end
   end
@@ -94,8 +94,7 @@ module PossibleMovesCreator
   def create_move_arrays
     all_moves = []
     all_moves = create_diagonal_arrays(all_moves)
-    all_moves = create_horizontal_vertical_arrays(all_moves)
-    all_moves
+    create_horizontal_vertical_arrays(all_moves)
   end
 
   # Creation of all diagonal move arrays - each possibility separately
@@ -150,25 +149,26 @@ module PossibleMovesCreator
 
   def not_checked_after_move?(position)
     return true unless @type == 'king'
+
     result = true
     color = @color
     temp = @parent.board[position[0]][position[1]]
     @parent.board[position[0]][position[1]] = self
     @parent.board[@position[0]][@position[1]] = '*'
     @parent.pieces_ary.each do |piece|
-        next if piece.type == 'king'
-        next if piece.color == @color
-        next if piece == temp
-        piece.moves_ary = []
-        piece.possible_captures
-        result = false if piece.moves_ary.include?(position)
-        break if result == false
+      next if piece.type == 'king'
+      next if piece.color == @color
+      next if piece == temp
+
+      piece.moves_ary = []
+      piece.possible_captures
+      result = false if piece.moves_ary.include?(position)
+      break if result == false
     end
     @parent.board[position[0]][position[1]] = temp
     @parent.board[@position[0]][@position[1]] = self
-    return result
+    result
   end
-
 
   # Constants for special move arrays
   KNIGHT_MOVES = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]].freeze

@@ -20,19 +20,17 @@ require_relative 'printer'
 
 # Used to start a new game or load existing game
 class Chess
-
   include Printer
 
   def initialize
-  if load_saved_game?
-    game = SaveLoad.new.load
-    return if game.nil?
-  else
-    game = Game.new
+    if load_saved_game?
+      game = SaveLoad.new.load
+      return if game.nil?
+    else
+      game = Game.new
+    end
+    game.play_game
   end
-  game.play_game
-end
-
 end
 
 Chess.new
