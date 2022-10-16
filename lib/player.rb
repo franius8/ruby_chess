@@ -1,3 +1,5 @@
+require_relative 'printer'
+
 # Class to handle interaction with players
 class Player
   include Printer

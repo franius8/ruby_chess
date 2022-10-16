@@ -1,3 +1,7 @@
+require_relative 'symbol_assigner'
+require_relative 'possible_moves_creator'
+require_relative 'printer'
+
 # Individual chess piece
 class Piece
     include SymbolAssigner
