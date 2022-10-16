@@ -1,3 +1,5 @@
+require_relative 'board_printing'
+
 # Contains the chess board with the chess pieces
 class Board
     include BoardPrinting
