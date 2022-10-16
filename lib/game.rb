@@ -1,3 +1,5 @@
+require_relative 'printer'
+
 # Controls game-level methods and victory conditions
 class Game
     include Printer
@@ -10,13 +12,11 @@ class Game
       @player2 = Player.new('black', self)
       @mate = false
       @mated_color = ''
-      # play_game
     end
   
     def play_game
-      SaveLoad.new.save(self)
       board.print_board
-      current_player = @player1
+      current_player = @player1 if @current_player.nil?
       until @mate == true
         message_before_move(current_player)
         current_player.move_piece
