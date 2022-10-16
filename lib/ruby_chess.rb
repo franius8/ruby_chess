@@ -15,7 +15,7 @@ require_relative 'saveload'
 # Controls game-level methods and victory conditions
 class Game
   include Printer
-  
+
   attr_accessor :board, :player, :mate, :mated_color
 
   def initialize
@@ -47,7 +47,7 @@ class Game
     end
   end
 
-  def determine_checked_player(player, piece)
+  def determine_checked_player(player)
     case player.color
     when 'black'
       @player1.check = true
@@ -59,7 +59,7 @@ end
 
 game = Game.new
 game.board.board[0][4] = '*'
-game.board.pieces_ary.reject! {|piece| piece.type == 'king' && piece.color == 'black'}
+game.board.pieces_ary.reject! { |piece| piece.type == 'king' && piece.color == 'black' }
 black_king = Piece.new('king', 'black', [4, 2], game.board)
 game.board.board[4][2] = black_king
 game.board.pieces_ary << black_king
