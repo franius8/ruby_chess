@@ -6,8 +6,8 @@ module Printer
       position = gets.chomp
       transformed_position = transform_position_from_user(position)
       piece = @parent.board.board[transformed_position[0]][transformed_position[1]]
-      return transformed_position if position_valid?(transformed_position, piece)
-
+      return transformed_position if position_valid?(transformed_position, piece) && @check == false
+      return transformed_position if piece.type == 'king' && @check == true
       print 'Invalid selection. Reason: '
       if !transformed_position[0].between?(0, 7) || !transformed_position[1].between?(0, 7)
         print 'Position outside range.'
@@ -17,6 +17,8 @@ module Printer
         print "Space occupied by opponent's piece."
       elsif piece.possible_moves_with_capture.empty?
         print 'No possible moves.'
+      elsif piece.type != 'king' && @check == true
+        print "Only the king may be moved in check."
       else
         print 'Unspecified'
       end
