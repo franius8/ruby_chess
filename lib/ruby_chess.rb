@@ -81,12 +81,14 @@ end
 # Contains the chess board with the chess pieces
 class Board
   include BoardPrinting
-  attr_accessor :board
+  attr_accessor :board, :pieces_ary
 
-  def initialize
+  def initialize(parent)
+    @parent = parent
     @board = Array.new(8, '*')
     @board.each_index { |index| @board[index] = Array.new(8, '*') }
     add_pieces
+    create_pieces_array
   end
 
   def add_pieces
@@ -108,8 +110,8 @@ class Board
 
   def add_white_pawns
     @board[1].each_index do |index|
-        @board[1][index] = Piece.new('pawn', 'black', [1, index], self)
-      end
+      @board[1][index] = Piece.new('pawn', 'black', [1, index], self)
+    end
   end
 
   def add_black_pieces
@@ -127,6 +129,16 @@ class Board
   def add_black_pawns
     @board[6].each_index do |index|
       @board[6][index] = Piece.new('pawn', 'white', [6, index], self)
+    end
+  end
+
+  def create_pieces_array
+    @pieces_ary = []
+    @board.each do |row|
+      row.each do |space|
+        next if space == '*'
+        @pieces_ary << space
+      end
     end
   end
 end
